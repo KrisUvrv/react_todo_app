@@ -1,0 +1,10 @@
+body {
+    font-family: 'Kanit', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    font-family: 'Kanit', sans-serif;
+}
