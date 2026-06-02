@@ -5,30 +5,41 @@ import {v1} from "uuid";
 import ThemeSwitcher from "./theme/ThemeSwitcher.tsx";
 
 export type FilterValuesType = 'all' | 'completed' | 'active';
+export type SortType = 'newest' | 'oldest';
 
 const App = () => {
 
     const initTasks: Array<TaskType> = [
-        {id: v1(), title: 'learn html', isDone: true},
-        {id: v1(), title: 'learn css', isDone: true},
-        {id: v1(), title: 'learn js', isDone: true},
-        {id: v1(), title: 'learn react', isDone: false},
-        {id: v1(), title: 'learn redux', isDone: false},
+        {id: v1(), title: 'learn html', isDone: true, createdAt: Date.now() - 5000},
+        {id: v1(), title: 'learn css', isDone: true, createdAt: Date.now() - 4000},
+        {id: v1(), title: 'learn js', isDone: true, createdAt: Date.now() - 3000},
+        {id: v1(), title: 'learn react', isDone: false, createdAt: Date.now() - 2000},
+        {id: v1(), title: 'learn redux', isDone: false, createdAt: Date.now() - 1000},
     ];
 
     const [tasks, setTasks] = useState<Array<TaskType>>(initTasks);
     const [filter, setFilter] = useState<FilterValuesType>('all');
+    const [sort, setSort] = useState<SortType>('newest');
+
+    const addTask = (title: string) => {
+        let newTask = { id: v1(), title: title, isDone: false, createdAt: Date.now() };
+        let newTasks = [newTask, ...tasks];
+        setTasks(newTasks);
+    }
 
     const removeTask = (id: string) => {
         const filteredTasks = tasks.filter(task => task.id !== id);
         setTasks(filteredTasks);
     }
-
-    const addTask = (title: string) => {
-        let newTask = { id: v1(), title: title, isDone: false };
-        let newTasks = [newTask, ...tasks];
-        setTasks(newTasks);
+    const editTask = (id: string, newTitle: string) => {
+        const updatedTasks = tasks.map(task =>
+            task.id === id
+                ? { ...task, title: newTitle }
+                : task
+        );
+        setTasks(updatedTasks);
     }
+
 
     const changeStatus = (taskId: string, isDone: boolean) => {
         let task = tasks.find((task) => task.id === taskId);
@@ -37,14 +48,17 @@ const App = () => {
         }
         let copy = [...tasks];
         setTasks(copy);
-
     }
 
     const changeFilter = (value: FilterValuesType) => {
         setFilter(value);
     }
 
-    let taskForTodoList = tasks;
+    const changeSort = (sort: SortType) => {
+        setSort(sort);
+    };
+
+    let taskForTodoList = [...tasks];
 
     if (filter === 'completed') {
         taskForTodoList = tasks.filter(task => task.isDone);
@@ -53,16 +67,25 @@ const App = () => {
         taskForTodoList = tasks.filter(task => !task.isDone);
     }
 
+    taskForTodoList.sort((a, b) =>
+        sort === 'newest'
+            ? b.createdAt - a.createdAt
+            : a.createdAt - b.createdAt
+    );
+
     return (
         <>
             <ThemeSwitcher />
             <TodoList title='TODO LIST'
                       tasks={taskForTodoList}
                       removeTask={removeTask}
+                      editTask={editTask}
                       filter={filter}
+                      sort={sort}
                       changeFilter={changeFilter}
                       addTask={addTask}
                       changeStatus={changeStatus}
+                      changeSort={changeSort}
             />
         </>
     )
