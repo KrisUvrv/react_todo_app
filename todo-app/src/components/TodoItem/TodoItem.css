@@ -1,0 +1,38 @@
+.todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 8px 12px;
+    margin-bottom: 8px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.todo-item__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.todo-item__right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.todo-item__title {
+    font-size: 16px;
+}
+
+.todo-item__date {
+    color: #888;
+    min-width: 90px;
+    text-align: right;
+}
+
+.todo-item__title.completed {
+    text-decoration: line-through;
+    color: #999;
+}

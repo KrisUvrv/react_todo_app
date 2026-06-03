@@ -1,11 +1,8 @@
-import './App.css';
-import TodoList, {type TaskType} from "./components/TodoList/TodoList.tsx";
+import TodoList from "./components/TodoList/TodoList.tsx";
 import {useState} from "react";
 import {v1} from "uuid";
-import ThemeSwitcher from "./theme/ThemeSwitcher.tsx";
-
-export type FilterValuesType = 'all' | 'completed' | 'active';
-export type SortType = 'newest' | 'oldest';
+import type {FilterValuesType, SortType} from "./types/todo.ts";
+import type {TaskType} from "./types/task.ts";
 
 const App = () => {
 
@@ -41,7 +38,7 @@ const App = () => {
     }
 
 
-    const changeStatus = (taskId: string, isDone: boolean) => {
+    const changeStatus = (taskId: string) => {
         let task = tasks.find((task) => task.id === taskId);
         if (task) {
             task.isDone = !task.isDone;
@@ -74,8 +71,7 @@ const App = () => {
     );
 
     return (
-        <>
-            <ThemeSwitcher />
+        <div className='app-wrapper'>
             <TodoList title='TODO LIST'
                       tasks={taskForTodoList}
                       removeTask={removeTask}
@@ -87,7 +83,7 @@ const App = () => {
                       changeStatus={changeStatus}
                       changeSort={changeSort}
             />
-        </>
+        </div>
     )
 }
 
