@@ -3,7 +3,7 @@ import {
     useContext,
     useMemo,
     useState,
-    type ReactNode,
+    type ReactNode, useEffect,
 } from 'react';
 
 import {
@@ -36,7 +36,14 @@ export function ThemeContextProvider({
                                      }: {
     children: ReactNode;
 }) {
-    const [mode, setMode] = useState<ThemeMode>('light');
+    const [mode, setMode] = useState<ThemeMode>(() => {
+        const saved = localStorage.getItem('theme');
+        return saved === 'dark' ? 'dark' : 'light';
+    });
+
+    useEffect(() => {
+        localStorage.setItem('theme', mode);
+    }, [mode]);
 
     const toggleTheme = () => {
         setMode((prev) => (prev === 'light' ? 'dark' : 'light'));

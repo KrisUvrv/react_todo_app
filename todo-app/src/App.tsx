@@ -1,26 +1,18 @@
 import TodoList from "./components/TodoList/TodoList.tsx";
-import {useState} from "react";
 import {v1} from "uuid";
 import type {FilterValuesType, SortType} from "./types/todo.ts";
 import type {TaskType} from "./types/task.ts";
+import {useLocalStorage} from "../hooks/useLocalStorage.hook.ts";
 
 const App = () => {
 
-    const initTasks: Array<TaskType> = [
-        {id: v1(), title: 'learn html', isDone: true, createdAt: Date.now() - 5000},
-        {id: v1(), title: 'learn css', isDone: true, createdAt: Date.now() - 4000},
-        {id: v1(), title: 'learn js', isDone: true, createdAt: Date.now() - 3000},
-        {id: v1(), title: 'learn react', isDone: false, createdAt: Date.now() - 2000},
-        {id: v1(), title: 'learn redux', isDone: false, createdAt: Date.now() - 1000},
-    ];
-
-    const [tasks, setTasks] = useState<Array<TaskType>>(initTasks);
-    const [filter, setFilter] = useState<FilterValuesType>('all');
-    const [sort, setSort] = useState<SortType>('newest');
+    const [filter, setFilter] = useLocalStorage<FilterValuesType>('filter', 'all');
+    const [sort, setSort] = useLocalStorage<SortType>('sort', 'newest');
+    const [tasks, setTasks] = useLocalStorage<TaskType[]>('tasks', []);
 
     const addTask = (title: string) => {
-        let newTask = { id: v1(), title: title, isDone: false, createdAt: Date.now() };
-        let newTasks = [newTask, ...tasks];
+        const newTask: TaskType = { id: v1(), title: title, isDone: false, createdAt: Date.now() };
+        const newTasks: TaskType[] = [newTask, ...tasks];
         setTasks(newTasks);
     }
 
