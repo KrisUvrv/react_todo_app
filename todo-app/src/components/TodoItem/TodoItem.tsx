@@ -1,4 +1,5 @@
-import {ChangeEvent, useState} from "react";
+import {useState} from "react";
+import type { ChangeEvent } from "react";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
@@ -31,7 +32,6 @@ export const TodoItem = ({task, tasks, removeTask, editTask, changeStatus}: Prop
         <li className="todo-item">
             <div className="todo-item__left">
                 <Checkbox
-                    type="checkbox"
                     checked={task.isDone}
                     onChange={onChangeCheckbox}
                 />

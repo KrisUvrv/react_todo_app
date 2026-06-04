@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-export function useLocalStorage<T>(key: string, initialValue: T) {
+export const useLocalStorage = <T>(key: string, initialValue: T) => {
     const [state, setState] = useState<T>(() => {
         const saved = localStorage.getItem(key);
         return saved ? JSON.parse(saved) : initialValue;

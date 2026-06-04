@@ -1,5 +1,4 @@
 import './TodoList.css';
-import React from "react";
 import {AddTodo} from "../AddTodo/AddTodo.tsx";
 import {TodoItem} from "../TodoItem/TodoItem.tsx";
 import {FilterSortPanel} from "../FilterSortPanel/FilterSortPanel.tsx";
