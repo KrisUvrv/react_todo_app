@@ -1,8 +1,8 @@
 export type FilterValuesType =
-    | 'all'
-    | 'completed'
-    | 'active';
+  | 'all'
+  | 'completed'
+  | 'active';
 
 export type SortType =
-    | 'newest'
-    | 'oldest';
+  | 'newest'
+  | 'oldest';
