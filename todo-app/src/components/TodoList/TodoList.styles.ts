@@ -1,14 +1,15 @@
 import styled from 'styled-components';
 
 export const TodoListContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;
 
 export const Heading = styled.div`
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 export const TaskList = styled.ul`

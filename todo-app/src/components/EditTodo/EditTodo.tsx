@@ -1,49 +1,51 @@
-import {useState} from "react";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import type {TaskType} from "@/types/task";
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { type ChangeEvent, useState } from 'react';
 
+import { useAppDispatch, useAppSelector } from '@/store/store.ts';
+import { todoActions, updateTodoThunk } from '@/store/todoSlice.ts';
+import type { Todo } from '@/types';
 
 type Props = {
-  task: TaskType;
-  tasks: TaskType[];
-
-  editTask: (id: string, newTitle: string) => void;
+  task: Todo;
   onClose: () => void;
 };
 
-export const EditTodo = ({
-                           task,
-                           tasks,
-                           editTask,
-                           onClose,
-                         }: Props) => {
+export const EditTodo = ({ task, onClose }: Props) => {
+  const [editTitle, setEditTitle] = useState(task.text);
 
-  const [editTitle, setEditTitle] = useState(task.title);
-  const [editError, setEditError] = useState('');
+  const dispatch = useAppDispatch();
+  const error = useAppSelector((state) => state.todos.error);
 
-  const saveEditTask = () => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setEditTitle(e.target.value);
+
+    if (error) {
+      dispatch(todoActions.clearError());
+    }
+  };
+
+  const saveEditTask = async () => {
     const trimmedTitle = editTitle.trim();
 
     if (!trimmedTitle) {
-      setEditError('Task title is required');
       return;
     }
 
-    const isExist = tasks.some(
-      t =>
-        t.id !== task.id &&
-        t.title.toLowerCase() ===
-        trimmedTitle.toLowerCase()
-    );
+    try {
+      await dispatch(
+        updateTodoThunk({
+          id: task.id,
+          payload: {
+            text: trimmedTitle,
+          },
+        }),
+      ).unwrap();
 
-    if (isExist) {
-      setEditError('This task already exists');
-      return;
+      onClose();
+    } catch {
+      console.error();
     }
-
-    editTask(task.id, trimmedTitle);
-    onClose();
   };
 
   return (
@@ -51,25 +53,13 @@ export const EditTodo = ({
       <TextField
         size="small"
         value={editTitle}
-        onChange={(e) => {
-          setEditTitle(e.target.value);
-
-          if (editError) {
-            setEditError('');
-          }
-        }}
-        error={!!editError}
-        helperText={editError}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            saveEditTask();
-          }
-        }}
+        onChange={handleChange}
+        error={!!error}
+        helperText={error}
+        onKeyDown={(e) => e.key === 'Enter' && saveEditTask()}
       />
 
-      <Button onClick={saveEditTask}>
-        Save
-      </Button>
+      <Button onClick={saveEditTask}>Save</Button>
     </>
   );
 };

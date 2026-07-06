@@ -34,9 +34,8 @@ export const DateText = styled.span`
 export const Title = styled.span<{ $completed: boolean }>`
   font-size: 16px;
 
-  text-decoration: ${({$completed}) =>
-          $completed ? 'line-through' : 'none'};
+  text-decoration: ${({ $completed }) =>
+    $completed ? 'line-through' : 'none'};
 
-  color: ${({$completed}) =>
-          $completed ? '#999' : 'inherit'};
+  color: ${({ $completed }) => ($completed ? '#999' : 'inherit')};
 `;

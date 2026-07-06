@@ -1,76 +1,63 @@
-import {useState, type ChangeEvent, type KeyboardEvent} from "react";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import type {TaskType} from "@/types/task";
+import { useAppDispatch, useAppSelector } from '@/store/store.ts';
+import { createTodoThunk, todoActions } from '@/store/todoSlice.ts';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
 
-type Props = {
-  addTask: (title: string) => void;
-  tasks: TaskType[];
-};
+export const AddTodo = () => {
+  const dispatch = useAppDispatch();
 
-export const AddTodo = ({addTask, tasks}: Props) => {
   const [title, setTitle] = useState('');
-  const [error, setError] = useState('');
+  const error = useAppSelector((state) => state.todos.error);
 
-  const createTask = () => {
-    const trimmedTitle = title.trim();
-
-    if (!trimmedTitle) {
-      setError('Task title is required');
-      return;
+  const clearServerError = () => {
+    if (error) {
+      dispatch(todoActions.clearError());
     }
+  };
 
-    const isExist = tasks.some(
-      task =>
-        task.title.toLowerCase() ===
-        trimmedTitle.toLowerCase()
-    );
+  const addTodo = (text: string) => dispatch(createTodoThunk(text));
 
-    if (isExist) {
-      setError('This task already exists');
-      return;
-    }
+  const handleAddTask = () => {
+    const value = title.trim();
 
-    addTask(trimmedTitle);
+    if (!value) return;
+
+    addTodo(value);
 
     setTitle('');
-    setError('');
+    setTitle('');
   };
 
-  const onChangeHandler = (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.currentTarget.value);
+    clearServerError();
+  };
 
-    if (error) {
-      setError('');
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleAddTask();
     }
   };
 
-  const onKeyDownHandler = (
-    e: KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (e.key === 'Enter') {
-      createTask();
-    }
+  const handleFocus = () => {
+    clearServerError();
   };
 
   return (
     <>
       <TextField
         value={title}
-        onChange={onChangeHandler}
-        onKeyDown={onKeyDownHandler}
-        error={!!error}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        error={Boolean(error)}
         helperText={error}
         label="New task"
         size="small"
       />
 
-      <Button
-        variant="contained"
-        onClick={createTask}
-      >
+      <Button variant="contained" onClick={handleAddTask}>
         Add
       </Button>
     </>

@@ -1,63 +1,52 @@
-import {ToggleButton, ToggleButtonGroup} from "@mui/material";
-import type {FilterValuesType, SortType} from "@/types/todo.ts";
-import {FilterSortPanelContainer} from "./FilterSortPanel.styles.ts";
+import { useAppDispatch, useAppSelector } from '@/store/store.ts';
+import { todoActions } from '@/store/todoSlice.ts';
+import type { TodoFilter, TodoSort } from '@/types';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { FilterSortPanelContainer } from './FilterSortPanel.styles.ts';
 
-type Props = {
-  filter: FilterValuesType;
-  sort: SortType;
+export const FilterSortPanel = () => {
+  const dispatch = useAppDispatch();
+  const filter = useAppSelector((state) => state.todos.filter);
+  const sort = useAppSelector((state) => state.todos.sort);
 
-  changeFilter: (value: FilterValuesType) => void;
-  changeSort: (value: SortType) => void;
-}
-
-export const FilterSortPanel = ({
-                                  filter,
-                                  sort,
-                                  changeFilter,
-                                  changeSort,
-                                }: Props) => {
+  const setFilter = (value: TodoFilter) => {
+    dispatch(todoActions.setFilter(value));
+  };
+  const setSort = (sort: TodoSort) => {
+    dispatch(todoActions.setSort(sort));
+  };
 
   return (
     <FilterSortPanelContainer>
       <ToggleButtonGroup
         value={sort}
         exclusive
-        onChange={(_, value: SortType | null) => {
+        onChange={(_, value: TodoSort | null) => {
           if (value) {
-            changeSort(value);
+            setSort(value);
           }
         }}
       >
-        <ToggleButton value="newest">
-          Newest
-        </ToggleButton>
+        <ToggleButton value="newest">Newest</ToggleButton>
 
-        <ToggleButton value="oldest">
-          Oldest
-        </ToggleButton>
+        <ToggleButton value="oldest">Oldest</ToggleButton>
       </ToggleButtonGroup>
 
       <ToggleButtonGroup
         color="primary"
         value={filter}
         exclusive
-        onChange={(_, value: FilterValuesType | null) => {
-          if (value) {
-            changeFilter(value);
+        onChange={(_, filter: TodoFilter | null) => {
+          if (filter) {
+            setFilter(filter);
           }
         }}
       >
-        <ToggleButton value="all">
-          All
-        </ToggleButton>
+        <ToggleButton value="all">All</ToggleButton>
 
-        <ToggleButton value="active">
-          Active
-        </ToggleButton>
+        <ToggleButton value="active">Active</ToggleButton>
 
-        <ToggleButton value="completed">
-          Completed
-        </ToggleButton>
+        <ToggleButton value="completed">Completed</ToggleButton>
       </ToggleButtonGroup>
     </FilterSortPanelContainer>
   );

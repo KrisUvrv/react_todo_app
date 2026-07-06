@@ -1,16 +1,13 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
-  type ReactNode, useEffect,
+  type ReactNode,
 } from 'react';
 
-import {
-  ThemeProvider,
-  CssBaseline,
-  createTheme,
-} from '@mui/material';
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -31,11 +28,7 @@ export const useColorMode = () => {
   return context;
 };
 
-export function ThemeContextProvider({
-                                       children,
-                                     }: {
-  children: ReactNode;
-}) {
+export function ThemeContextProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>(() => {
     const saved = localStorage.getItem('theme');
     return saved === 'dark' ? 'dark' : 'light';
@@ -56,13 +49,13 @@ export function ThemeContextProvider({
           mode,
         },
       }),
-    [mode]
+    [mode],
   );
 
   return (
-    <ColorModeContext.Provider value={{mode, toggleTheme}}>
+    <ColorModeContext.Provider value={{ mode, toggleTheme }}>
       <ThemeProvider theme={theme}>
-        <CssBaseline/>
+        <CssBaseline />
         {children}
       </ThemeProvider>
     </ColorModeContext.Provider>

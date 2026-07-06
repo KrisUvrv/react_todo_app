@@ -1,69 +1,58 @@
-import {useState} from "react";
-import type {ChangeEvent} from "react";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import {EditTodo} from "../EditTodo/EditTodo.tsx";
-import {Checkbox} from "@mui/material";
-import {DateText, Title, Left, Right, TodoItemContainer} from "./TodoItem.styles.ts";
-import type {TaskType} from "@/types/task";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Checkbox } from '@mui/material';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import { useState } from 'react';
+import { EditTodo } from '../EditTodo/EditTodo.tsx';
+import {
+  DateText,
+  Left,
+  Right,
+  Title,
+  TodoItemContainer,
+} from './TodoItem.styles.ts';
+
+import { useAppDispatch } from '@/store/store.ts';
+import { deleteTodoThunk, toggleTodoThunk } from '@/store/todoSlice.ts';
+import type { Todo } from '@/types';
 
 type Props = {
-  task: TaskType;
-  tasks: TaskType[];
-
-  removeTask: (id: string) => void;
-  editTask: (id: string, newTitle: string) => void;
-  changeStatus: (id: string, isDone: boolean) => void;
+  task: Todo;
 };
 
-export const TodoItem = ({task, tasks, removeTask, editTask, changeStatus}: Props) => {
-
+export const TodoItem = ({ task }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const onChangeCheckbox = (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    changeStatus(task.id, e.currentTarget.checked);
+  const dispatch = useAppDispatch();
+  const removeTodo = () => dispatch(deleteTodoThunk(task.id));
+
+  const toggleTodo = () => {
+    dispatch(toggleTodoThunk(task.id));
   };
 
   return (
     <TodoItemContainer>
       <Left>
-        <Checkbox
-          checked={task.isDone}
-          onChange={onChangeCheckbox}
-        />
+        <Checkbox checked={task.completed} onChange={toggleTodo} />
 
         {isEditing ? (
-          <EditTodo
-            task={task}
-            tasks={tasks}
-            editTask={editTask}
-            onClose={() => setIsEditing(false)}
-          />
+          <EditTodo task={task} onClose={() => setIsEditing(false)} />
         ) : (
-          <Title $completed={task.isDone}>
-            {task.title}
-          </Title>
+          <Title $completed={task.completed}>{task.text}</Title>
         )}
       </Left>
 
       <Right>
-        <DateText>
-          {new Date(task.createdAt).toLocaleDateString()}
-        </DateText>
+        <DateText>{new Date(task.createdAt).toLocaleDateString()}</DateText>
 
         <Tooltip title="Edit">
-          <Button onClick={() => setIsEditing(true)}>
-            Edit
-          </Button>
+          <Button onClick={() => setIsEditing(true)}>Edit</Button>
         </Tooltip>
 
         <Tooltip title="Delete">
-          <IconButton onClick={() => removeTask(task.id)}>
-            <DeleteIcon/>
+          <IconButton onClick={removeTodo}>
+            <DeleteIcon />
           </IconButton>
         </Tooltip>
       </Right>
