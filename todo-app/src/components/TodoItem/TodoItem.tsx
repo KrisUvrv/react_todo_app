@@ -6,43 +6,43 @@ import Tooltip from '@mui/material/Tooltip';
 import { EditTodo } from '../EditTodo/EditTodo.tsx';
 import * as S from './TodoItem.styles.ts';
 
-import { useAppDispatch } from '@/store/store.ts';
-import {
-  deleteTodoThunk,
-  todoActions,
-  toggleTodoThunk,
-} from '@/store/todoSlice.ts';
 import type { Todo } from '@/types';
 
 type Props = {
   task: Todo;
   isEditing: boolean;
   onEditClick: (id: number) => void;
+  onSave: (id: number, title: string) => void;
+  onDelete: (id: number) => void;
+  toggleTodo: (id: number) => void;
+  clearServerError: () => void;
+  onCloseEdit: () => void;
 };
 
-export const TodoItem = ({ task, isEditing, onEditClick }: Props) => {
-
-  const dispatch = useAppDispatch();
-
-  const removeTodo = () => dispatch(deleteTodoThunk(task.id));
-  const toggleTodo = () => {
-    dispatch(toggleTodoThunk(task.id));
-  };
-
+export const TodoItem = ({
+  task,
+  isEditing,
+  onEditClick,
+  onSave,
+  onDelete,
+  toggleTodo,
+  clearServerError,
+  onCloseEdit,
+}: Props) => {
   return (
     <S.TodoItemContainer>
       <S.Left>
         <Checkbox
           checked={task.completed}
-          onChange={toggleTodo}
+          onChange={() => toggleTodo(task.id)}
         />
 
         {isEditing ? (
           <EditTodo
             task={task}
-            onClose={() => {
-              dispatch(todoActions.stopEditing());
-            }}
+            onClose={onCloseEdit}
+            clearServerError={clearServerError}
+            onSave={async (title) => onSave(task.id, title)}
           />
         ) : (
           <S.Title $completed={task.completed}>{task.text}</S.Title>
@@ -63,7 +63,7 @@ export const TodoItem = ({ task, isEditing, onEditClick }: Props) => {
         </Tooltip>
 
         <Tooltip title="Delete">
-          <IconButton onClick={removeTodo}>
+          <IconButton onClick={() => onDelete(task.id)}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>

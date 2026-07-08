@@ -2,26 +2,29 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { type ChangeEvent, useState } from 'react';
 
-import { useAppDispatch } from '@/store/store.ts';
-import { todoActions, updateTodoThunk } from '@/store/todoSlice.ts';
 import type { Todo } from '@/types';
 
 type Props = {
   task: Todo;
   onClose: () => void;
+  clearServerError: () => void;
+  onSave: (title: string) => Promise<void>;
 };
 
-export const EditTodo = ({ task, onClose }: Props) => {
+export const EditTodo = ({
+  task,
+  onClose,
+  clearServerError,
+  onSave,
+}: Props) => {
   const [editTitle, setEditTitle] = useState(task.text);
-
-  const dispatch = useAppDispatch();
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEditTitle(e.target.value);
 
     if (error) {
-      dispatch(todoActions.clearError());
+      clearServerError();
     }
   };
 
@@ -29,15 +32,7 @@ export const EditTodo = ({ task, onClose }: Props) => {
     const trimmedTitle = editTitle.trim();
 
     try {
-      await dispatch(
-        updateTodoThunk({
-          id: task.id,
-          payload: {
-            text: trimmedTitle,
-          },
-        }),
-      ).unwrap();
-
+      await onSave(trimmedTitle);
       onClose();
     } catch (error) {
       setError(error as string);
@@ -46,16 +41,16 @@ export const EditTodo = ({ task, onClose }: Props) => {
 
   return (
     <>
-        <TextField
-          size="small"
-          value={editTitle}
-          onChange={handleChange}
-          error={!!error}
-          helperText={error}
-          onKeyDown={(e) => e.key === 'Enter' && saveEditTask()}
-        />
+      <TextField
+        size="small"
+        value={editTitle}
+        onChange={handleChange}
+        error={!!error}
+        helperText={error}
+        onKeyDown={(e) => e.key === 'Enter' && saveEditTask()}
+      />
 
-        <Button onClick={saveEditTask}>Save</Button>
+      <Button onClick={saveEditTask}>Save</Button>
     </>
   );
 };

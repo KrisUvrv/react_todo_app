@@ -10,10 +10,6 @@ export const AddTodo = () => {
   const [title, setTitle] = useState('');
   const error = useAppSelector((state) => state.todos.error);
 
-  const isEditing = useAppSelector(
-    (state) => state.todos.editingTodoId !== null,
-  );
-
   const clearServerError = () => {
     dispatch(todoActions.clearError());
   };

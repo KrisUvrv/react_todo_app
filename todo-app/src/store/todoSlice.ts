@@ -172,8 +172,7 @@ export const todoSlice = createSlice({
       })
       .addCase(toggleTodoThunk.fulfilled, (state, action) => {
         replaceTodo(state, action.payload);
-      })
-
+      });
   },
 });
 
