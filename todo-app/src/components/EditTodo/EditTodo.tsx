@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { type ChangeEvent, useState } from 'react';
 
-import { useAppDispatch, useAppSelector } from '@/store/store.ts';
+import { useAppDispatch } from '@/store/store.ts';
 import { todoActions, updateTodoThunk } from '@/store/todoSlice.ts';
 import type { Todo } from '@/types';
 
@@ -15,7 +15,7 @@ export const EditTodo = ({ task, onClose }: Props) => {
   const [editTitle, setEditTitle] = useState(task.text);
 
   const dispatch = useAppDispatch();
-  const error = useAppSelector((state) => state.todos.error);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEditTitle(e.target.value);
@@ -28,10 +28,6 @@ export const EditTodo = ({ task, onClose }: Props) => {
   const saveEditTask = async () => {
     const trimmedTitle = editTitle.trim();
 
-    if (!trimmedTitle) {
-      return;
-    }
-
     try {
       await dispatch(
         updateTodoThunk({
@@ -43,23 +39,23 @@ export const EditTodo = ({ task, onClose }: Props) => {
       ).unwrap();
 
       onClose();
-    } catch {
-      console.error();
+    } catch (error) {
+      setError(error as string);
     }
   };
 
   return (
     <>
-      <TextField
-        size="small"
-        value={editTitle}
-        onChange={handleChange}
-        error={!!error}
-        helperText={error}
-        onKeyDown={(e) => e.key === 'Enter' && saveEditTask()}
-      />
+        <TextField
+          size="small"
+          value={editTitle}
+          onChange={handleChange}
+          error={!!error}
+          helperText={error}
+          onKeyDown={(e) => e.key === 'Enter' && saveEditTask()}
+        />
 
-      <Button onClick={saveEditTask}>Save</Button>
+        <Button onClick={saveEditTask}>Save</Button>
     </>
   );
 };

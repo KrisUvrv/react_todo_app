@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { PaginationContainer } from './PaginationControls.styles';
+import * as S from './PaginationControls.styles';
 
 export const PaginationControls = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,7 +26,7 @@ export const PaginationControls = () => {
   return (
     <>
       {totalPages > 0 && (
-        <PaginationContainer>
+        <S.PaginationContainer>
           <Pagination
             count={totalPages}
             page={page}
@@ -40,7 +40,7 @@ export const PaginationControls = () => {
               <MenuItem value={20}>20</MenuItem>
             </Select>
           </FormControl>
-        </PaginationContainer>
+        </S.PaginationContainer>
       )}
     </>
   );

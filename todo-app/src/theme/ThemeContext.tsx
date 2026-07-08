@@ -29,10 +29,9 @@ export const useColorMode = () => {
 };
 
 export function ThemeContextProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem('theme');
-    return saved === 'dark' ? 'dark' : 'light';
-  });
+  const [mode, setMode] = useState<ThemeMode>(
+    (localStorage.getItem('theme') || 'light') as ThemeMode,
+  );
 
   useEffect(() => {
     localStorage.setItem('theme', mode);

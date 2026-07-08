@@ -28,6 +28,7 @@ export interface TodoState {
   totalPages: number;
   isLoading: boolean;
   error: string | null;
+  editingTodoId: number | null;
 }
 
 const initialState: TodoState = {
@@ -39,6 +40,7 @@ const initialState: TodoState = {
   totalPages: 0,
   isLoading: false,
   error: null,
+  editingTodoId: null,
 };
 
 export const fetchTodosThunk = createAsyncThunk<
@@ -48,13 +50,21 @@ export const fetchTodosThunk = createAsyncThunk<
   return await fetchTodos(params);
 });
 
+export const refetchTodosThunk = createAsyncThunk<TodosResponse>(
+  'todos/fetchTodos',
+  async (_, { getState }) => {
+    return await fetchTodos(getState().todos);
+  },
+);
+
 export const createTodoThunk = createAsyncThunk<
   Todo,
   string,
   { rejectValue: string }
->('todos/createTodo', async (text: string, { rejectWithValue }) => {
+>('todos/createTodo', async (text: string, { rejectWithValue, dispatch }) => {
   try {
-    return await createTodo(text);
+    await createTodo(text);
+    await dispatch(refetchTodosThunk());
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return rejectWithValue(error.response?.data?.error ?? 'Error');
@@ -63,18 +73,24 @@ export const createTodoThunk = createAsyncThunk<
   }
 });
 
-export const updateTodoThunk = createAsyncThunk(
-  'todos/updateTodo',
-  async ({
-    id,
-    payload,
-  }: {
+export const updateTodoThunk = createAsyncThunk<
+  Todo,
+  {
     id: number;
     payload: { text?: string; completed?: boolean };
-  }) => {
-    return await updateTodo(id, payload);
   },
-);
+  { rejectValue: string }
+>('todos/updateTodo', async ({ id, payload }, { rejectWithValue }) => {
+  try {
+    return await updateTodo(id, payload);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return rejectWithValue(error.response?.data?.error ?? 'Error');
+    }
+
+    return rejectWithValue('Error');
+  }
+});
 
 export const toggleTodoThunk = createAsyncThunk(
   'todos/toggleTodo',
@@ -85,8 +101,9 @@ export const toggleTodoThunk = createAsyncThunk(
 
 export const deleteTodoThunk = createAsyncThunk(
   'todos/deleteTodo',
-  async (id: number) => {
+  async (id: number, thunkAPI) => {
     await deleteTodo(id);
+    await thunkAPI.dispatch(refetchTodosThunk());
     return id;
   },
 );
@@ -122,6 +139,12 @@ export const todoSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    startEditing: (state, action: PayloadAction<number>) => {
+      state.editingTodoId = action.payload;
+    },
+    stopEditing: (state) => {
+      state.editingTodoId = null;
+    },
   },
 
   extraReducers: (builder) => {
@@ -138,8 +161,7 @@ export const todoSlice = createSlice({
       .addCase(fetchTodosThunk.rejected, (state) => {
         state.isLoading = false;
       })
-      .addCase(createTodoThunk.fulfilled, (state, action) => {
-        state.tasks.unshift(action.payload);
+      .addCase(createTodoThunk.fulfilled, (state) => {
         state.error = null;
       })
       .addCase(createTodoThunk.rejected, (state, action) => {
@@ -151,9 +173,7 @@ export const todoSlice = createSlice({
       .addCase(toggleTodoThunk.fulfilled, (state, action) => {
         replaceTodo(state, action.payload);
       })
-      .addCase(deleteTodoThunk.fulfilled, (state, action) => {
-        state.tasks = state.tasks.filter((task) => task.id !== action.payload);
-      });
+
   },
 });
 

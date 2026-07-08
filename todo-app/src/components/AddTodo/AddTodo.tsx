@@ -10,22 +10,21 @@ export const AddTodo = () => {
   const [title, setTitle] = useState('');
   const error = useAppSelector((state) => state.todos.error);
 
-  const clearServerError = () => {
-    if (error) {
-      dispatch(todoActions.clearError());
-    }
-  };
+  const isEditing = useAppSelector(
+    (state) => state.todos.editingTodoId !== null,
+  );
 
-  const addTodo = (text: string) => dispatch(createTodoThunk(text));
+  const clearServerError = () => {
+    dispatch(todoActions.clearError());
+  };
 
   const handleAddTask = () => {
     const value = title.trim();
 
     if (!value) return;
 
-    addTodo(value);
+    dispatch(createTodoThunk(value));
 
-    setTitle('');
     setTitle('');
   };
 

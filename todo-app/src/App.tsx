@@ -1,11 +1,11 @@
-import { AppWrapper } from './App.styles';
-import TodoList from './components/TodoList/TodoList.tsx';
+import * as S from './App.styles';
+import TodoListContainer from './components/TodoListContainer/TodoListContainer.tsx';
 
 const App = () => {
   return (
-    <AppWrapper>
-      <TodoList />
-    </AppWrapper>
+    <S.AppWrapper>
+      <TodoListContainer />
+    </S.AppWrapper>
   );
 };
 

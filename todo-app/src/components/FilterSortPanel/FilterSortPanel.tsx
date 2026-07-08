@@ -1,8 +1,37 @@
+import {
+  ToggleButtons,
+  type ToggleButtonsOption,
+} from '@/components/ToggleButtons/ToggleButtons.tsx';
 import { useAppDispatch, useAppSelector } from '@/store/store.ts';
 import { todoActions } from '@/store/todoSlice.ts';
 import type { TodoFilter, TodoSort } from '@/types';
-import { ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { FilterSortPanelContainer } from './FilterSortPanel.styles.ts';
+import * as S from './FilterSortPanel.styles.ts';
+
+const SORT_OPTIONS: ToggleButtonsOption<TodoSort>[] = [
+  {
+    value: 'newest',
+    title: 'Newest',
+  },
+  {
+    value: 'oldest',
+    title: 'Oldest',
+  },
+];
+
+const FILTER_OPTIONS: ToggleButtonsOption<TodoFilter>[] = [
+  {
+    value: 'all',
+    title: 'All',
+  },
+  {
+    value: 'active',
+    title: 'Active',
+  },
+  {
+    value: 'completed',
+    title: 'Completed',
+  },
+];
 
 export const FilterSortPanel = () => {
   const dispatch = useAppDispatch();
@@ -17,37 +46,20 @@ export const FilterSortPanel = () => {
   };
 
   return (
-    <FilterSortPanelContainer>
-      <ToggleButtonGroup
-        value={sort}
+    <S.FilterSortPanelContainer>
+      <ToggleButtons
         exclusive
-        onChange={(_, value: TodoSort | null) => {
-          if (value) {
-            setSort(value);
-          }
-        }}
-      >
-        <ToggleButton value="newest">Newest</ToggleButton>
-
-        <ToggleButton value="oldest">Oldest</ToggleButton>
-      </ToggleButtonGroup>
-
-      <ToggleButtonGroup
+        value={sort}
+        onOptionChange={setSort}
+        options={SORT_OPTIONS}
+      />
+      <ToggleButtons
+        exclusive
         color="primary"
         value={filter}
-        exclusive
-        onChange={(_, filter: TodoFilter | null) => {
-          if (filter) {
-            setFilter(filter);
-          }
-        }}
-      >
-        <ToggleButton value="all">All</ToggleButton>
-
-        <ToggleButton value="active">Active</ToggleButton>
-
-        <ToggleButton value="completed">Completed</ToggleButton>
-      </ToggleButtonGroup>
-    </FilterSortPanelContainer>
+        onOptionChange={setFilter}
+        options={FILTER_OPTIONS}
+      />
+    </S.FilterSortPanelContainer>
   );
 };
