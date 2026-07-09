@@ -45,7 +45,7 @@ export const TodoItem = ({
             onSave={async (title) => onSave(task.id, title)}
           />
         ) : (
-          <S.Title $completed={task.completed}>{task.text}</S.Title>
+          <S.Title completed={task.completed}>{task.text}</S.Title>
         )}
       </S.Left>
 

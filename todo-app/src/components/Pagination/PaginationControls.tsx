@@ -6,6 +6,7 @@ import {
   MenuItem,
   Pagination,
   Select,
+  type SelectChangeEvent,
 } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,7 +20,7 @@ export const PaginationControls = () => {
     dispatch(todoActions.setPage(value));
   };
 
-  const handleLimitChange = (e) => {
+  const handleLimitChange = (e: SelectChangeEvent<number>) => {
     dispatch(todoActions.setLimit(Number(e.target.value)));
   };
 

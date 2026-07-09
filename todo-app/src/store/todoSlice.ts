@@ -5,18 +5,16 @@ import {
   toggleTodo,
   updateTodo,
 } from '@/api/todos';
+import { createAppAsyncThunk } from '@/store/createAppAsyncThunk.ts';
 import type {
   FetchTodosParams,
   Todo,
   TodoFilter,
   TodoSort,
   TodosResponse,
+  UpdateTodoPayload,
 } from '@/types';
-import {
-  createAsyncThunk,
-  createSlice,
-  type PayloadAction,
-} from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 export interface TodoState {
@@ -43,22 +41,22 @@ const initialState: TodoState = {
   editingTodoId: null,
 };
 
-export const fetchTodosThunk = createAsyncThunk<
+export const fetchTodosThunk = createAppAsyncThunk<
   TodosResponse,
   FetchTodosParams
 >('todos/fetchTodos', async (params: FetchTodosParams) => {
   return await fetchTodos(params);
 });
 
-export const refetchTodosThunk = createAsyncThunk<TodosResponse>(
+export const refetchTodosThunk = createAppAsyncThunk<TodosResponse, void>(
   'todos/fetchTodos',
   async (_, { getState }) => {
     return await fetchTodos(getState().todos);
   },
 );
 
-export const createTodoThunk = createAsyncThunk<
-  Todo,
+export const createTodoThunk = createAppAsyncThunk<
+  void,
   string,
   { rejectValue: string }
 >('todos/createTodo', async (text: string, { rejectWithValue, dispatch }) => {
@@ -73,11 +71,11 @@ export const createTodoThunk = createAsyncThunk<
   }
 });
 
-export const updateTodoThunk = createAsyncThunk<
+export const updateTodoThunk = createAppAsyncThunk<
   Todo,
   {
     id: number;
-    payload: { text?: string; completed?: boolean };
+    payload: UpdateTodoPayload;
   },
   { rejectValue: string }
 >('todos/updateTodo', async ({ id, payload }, { rejectWithValue }) => {
@@ -92,18 +90,26 @@ export const updateTodoThunk = createAsyncThunk<
   }
 });
 
-export const toggleTodoThunk = createAsyncThunk(
-  'todos/toggleTodo',
-  async (id: number) => {
+export const toggleTodoThunk = createAppAsyncThunk<
+  Todo,
+  number,
+  { rejectValue: string }
+>('todos/toggleTodo', async (id, { rejectWithValue }) => {
+  try {
     return await toggleTodo(id);
-  },
-);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return rejectWithValue(error.response?.data?.error ?? 'Error');
+    }
+    return rejectWithValue('Error');
+  }
+});
 
-export const deleteTodoThunk = createAsyncThunk(
+export const deleteTodoThunk = createAppAsyncThunk<number, number>(
   'todos/deleteTodo',
-  async (id: number, thunkAPI) => {
+  async (id, { dispatch }) => {
     await deleteTodo(id);
-    await thunkAPI.dispatch(refetchTodosThunk());
+    await dispatch(refetchTodosThunk());
     return id;
   },
 );
